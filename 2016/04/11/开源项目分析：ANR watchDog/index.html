@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>开源项目分析：ANR watchDog | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="开源项目分析：ANR watchDogANR watchDog
+项目关键逻辑如下图所示：
+
+
+展望：利用handler可以实现两个相互唤醒的Service！！！
+关键逻辑如下：1.在watch dog线程中获取UI线程的Handler1private final Handler _uiHandler = new Handler(Looper.getMainLooper());
+
+###2.在wat">
+<meta property="og:type" content="article">
+<meta property="og:title" content="开源项目分析：ANR watchDog">
+<meta property="og:url" content="http://yoursite.com/2016/04/11/开源项目分析：ANR watchDog/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="开源项目分析：ANR watchDogANR watchDog
+项目关键逻辑如下图所示：
+
+
+展望：利用handler可以实现两个相互唤醒的Service！！！
+关键逻辑如下：1.在watch dog线程中获取UI线程的Handler1private final Handler _uiHandler = new Handler(Looper.getMainLooper());
+
+###2.在wat">
+<meta property="og:image" content="http://yoursite.com/images/watchdog.png">
+<meta property="og:updated_time" content="2016-04-11T14:41:47.496Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="开源项目分析：ANR watchDog">
+<meta name="twitter:description" content="开源项目分析：ANR watchDogANR watchDog
+项目关键逻辑如下图所示：
+
+
+展望：利用handler可以实现两个相互唤醒的Service！！！
+关键逻辑如下：1.在watch dog线程中获取UI线程的Handler1private final Handler _uiHandler = new Handler(Looper.getMainLooper());
+
+###2.在wat">
+<meta name="twitter:image" content="http://yoursite.com/images/watchdog.png">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Zoeken"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" results="0" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-开源项目分析：ANR watchDog" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/04/11/开源项目分析：ANR watchDog/" class="article-date">
+  <time datetime="2016-04-11T15:28:55.935Z" itemprop="datePublished">2016-04-11</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      开源项目分析：ANR watchDog
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="开源项目分析：ANR-watchDog"><a href="#开源项目分析：ANR-watchDog" class="headerlink" title="开源项目分析：ANR watchDog"></a>开源项目分析：ANR watchDog</h1><p><a href="/images/watchdog.png">ANR watchDog</a></p>
+<p>项目关键逻辑如下图所示：</p>
+<p><img src="/images/watchdog.png" alt="MacDown logo"></p>
+<blockquote>
+<p>展望：<br>利用handler可以实现两个相互唤醒的Service！！！</p>
+<h2 id="关键逻辑如下："><a href="#关键逻辑如下：" class="headerlink" title="关键逻辑如下："></a>关键逻辑如下：</h2><h3 id="1-在watch-dog线程中获取UI线程的Handler"><a href="#1-在watch-dog线程中获取UI线程的Handler" class="headerlink" title="1.在watch dog线程中获取UI线程的Handler"></a>1.在watch dog线程中获取UI线程的Handler</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">private final Handler _uiHandler = new Handler(Looper.getMainLooper());</span><br></pre></td></tr></table></figure>
+</blockquote>
+<p>###2.在watch dog线程中创建Runnable以供UI线程执行<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">private final Runnable _ticker = new Runnable() &#123;</span><br><span class="line">        @Override public void run() &#123;</span><br><span class="line">            _tick = (_tick + 1) % Integer.MAX_VALUE;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br></pre></td></tr></table></figure></p>
+<h3 id="3-在watch-dog线程中监听ui线程（默认每隔5秒）"><a href="#3-在watch-dog线程中监听ui线程（默认每隔5秒）" class="headerlink" title="3.在watch dog线程中监听ui线程（默认每隔5秒）"></a>3.在watch dog线程中监听ui线程（默认每隔5秒）</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">while (!isInterrupted()) &#123;</span><br><span class="line">	lastTick = _tick;</span><br><span class="line">	_uiHandler.post(_ticker);</span><br><span class="line">	try &#123;</span><br><span class="line">    	Thread.sleep(_timeoutInterval);</span><br><span class="line">	&#125;</span><br><span class="line">	catch (InterruptedException e) &#123;</span><br><span class="line">    	_interruptionListener.onInterrupted(e);</span><br><span class="line">    	return ;</span><br><span class="line">    &#125;</span><br><span class="line">    //比较lastTick是否被改变？如果lastTick变化则ui线程为正常。如果不变，则出现了ANR</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="watch-dog存在的不足："><a href="#watch-dog存在的不足：" class="headerlink" title="watch dog存在的不足："></a>watch dog存在的不足：</h2><p>由于watch dog线程是由App在application中创建的死循环线程，需要注意耗电的问题！！！</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2016/04/11/开源项目分析：ANR watchDog/" data-id="cimw5o8vm0001scunf2grr6r3" class="article-share-link">Delen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/android-source-code/">android,source code</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2016/04/11/Mac下编译android-6-0/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Nieuwer</strong>
+      <div class="article-nav-title">
+        
+          Mac下编译android 6.0
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2016/04/11/hello-world/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Ouder</strong>
+      <div class="article-nav-title">Hello World</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Labels</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/android-source-code/">android,source code</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/android-source-code/" style="font-size: 10px;">android,source code</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archieven</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recente berichten</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2016/04/11/Mac下编译android-6-0/">Mac下编译android 6.0</a>
+          </li>
+        
+          <li>
+            <a href="/2016/04/11/开源项目分析：ANR watchDog/">开源项目分析：ANR watchDog</a>
+          </li>
+        
+          <li>
+            <a href="/2016/04/11/hello-world/">Hello World</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2016 John Doe<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
